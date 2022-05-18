@@ -67,6 +67,9 @@ save_file (TextViewerWindow *self,
 static void
 save_file_complete (GObject      *source_object,
                     GAsyncResult *result,
-                    gpointer      user_data);
+                    TextViewerWindow *self);
+
+static void
+text_viewer_window_finalize (GObject *gobject);
 
 G_END_DECLS

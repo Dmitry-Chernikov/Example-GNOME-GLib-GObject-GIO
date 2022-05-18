@@ -18,10 +18,15 @@
 
 #include "text_viewer-config.h"
 #include "text_viewer-window.h"
+//
+#include "adwaita.h"
 
 struct _TextViewerWindow
 {
   GtkApplicationWindow  parent_instance;
+  
+  //GSettings — это объект, который отслеживает ключи для определенного идентификатора схемы
+  GSettings *settings;
 
   /* Template widgets */
   GtkHeaderBar        *header_bar;
@@ -29,6 +34,7 @@ struct _TextViewerWindow
   GtkTextView         *main_text_view;
   GtkButton           *open_button, *save_button;
   GtkLabel            *cursor_pos;
+  AdwToastOverlay     *toast_overlay;
 };
 
 G_DEFINE_TYPE (TextViewerWindow, text_viewer_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -37,6 +43,11 @@ static void
 text_viewer_window_class_init (TextViewerWindowClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  
+  //чтобы включить функцию завершения
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  //функция text_viewer_window_finalizeбудет вызываться, когда экземпляр TextViewerWindow будет освобожден
+  gobject_class->finalize = text_viewer_window_finalize;
 
   gtk_widget_class_set_template_from_resource (widget_class, "/com/example/TextViewer/text_viewer-window.ui");
   gtk_widget_class_bind_template_child (widget_class, TextViewerWindow, header_bar);
@@ -45,6 +56,7 @@ text_viewer_window_class_init (TextViewerWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, TextViewerWindow, open_button);
   gtk_widget_class_bind_template_child (widget_class, TextViewerWindow, cursor_pos);
   gtk_widget_class_bind_template_child (widget_class, TextViewerWindow, save_button);
+  gtk_widget_class_bind_template_child (widget_class, TextViewerWindow, toast_overlay);
 }
 
 static void
@@ -70,6 +82,22 @@ text_viewer_window_init (TextViewerWindow *self)
   //Подключите обратный вызов к сигналу notify::cursor-position,
   //чтобы получать уведомление каждый раз, когда cursor-position свойство изменяется
   g_signal_connect (buffer, "notify::cursor-position", G_CALLBACK (text_viewer_window_update_cursor_position), self);
+  
+  //создать экземпляр GSettings com.example.TextViewer для идентификатора схемы
+  self->settings = g_settings_new ("com.example.TextViewer");
+  
+  //Привязать настройки к свойствам состояния окна 
+  //привязать клавиши window-width , window-height и window-maximize к 
+  //свойствам default-width , default-height и maximated соответственно 
+  g_settings_bind (self->settings, "window-width",
+                   G_OBJECT (self), "default-width",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (self->settings, "window-height",
+                   G_OBJECT (self), "default-height",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (self->settings, "window-maximized",
+                   G_OBJECT (self), "maximized",
+                   G_SETTINGS_BIND_DEFAULT);
 }
 
 static void
@@ -184,9 +212,12 @@ open_file_complete (GObject          *source_object,
   // В случае ошибки распечатайте предупреждение на стандартный вывод ошибок
   if (error != NULL)
     {
-      g_printerr ("Unable to open “%s”: %s\n",
-                  g_file_peek_path (file),
-                  error->message);
+      g_printerr ("Unable to open “%s”: %s\n", g_file_peek_path (file), error->message);
+      
+      g_autofree char *msg = g_strdup_printf("Unable to open “%s”", display_name);
+      
+      adw_toast_overlay_add_toast (self->toast_overlay, adw_toast_new (msg));
+      
       return;
     }
 
@@ -197,6 +228,11 @@ open_file_complete (GObject          *source_object,
       g_printerr ("Unable to load the contents of “%s”: "
                   "the file is not encoded with UTF-8\n",
                   g_file_peek_path (file));
+      
+      g_autofree char *msg = g_strdup_printf("Invalid text encoding for “%s”", display_name);
+      
+      adw_toast_overlay_add_toast (self->toast_overlay, adw_toast_new (msg));
+      
       return;
     }
 
@@ -219,6 +255,12 @@ open_file_complete (GObject          *source_object,
   // Set the title using the display name
   // Установите заголовок, используя отображаемое имя
   gtk_window_set_title (GTK_WINDOW (self), display_name);
+
+  // Show a toast for the successful loading
+  // Показать тост за успешную загрузку 
+  g_autofree char *msg = g_strdup_printf ("Opened “%s”", display_name);
+
+  adw_toast_overlay_add_toast (self->toast_overlay, adw_toast_new (msg));
 }
 
 static void
@@ -315,7 +357,7 @@ save_file (TextViewerWindow *self,
 static void
 save_file_complete (GObject      *source_object,
                     GAsyncResult *result,
-                    gpointer      user_data)
+                    TextViewerWindow *self)
 {
   GFile *file = G_FILE (source_object);
 
@@ -336,8 +378,27 @@ save_file_complete (GObject      *source_object,
       display_name = g_file_get_basename (file);
     }
 
+  g_autofree char *msg = NULL;
   if (error != NULL)
     {
       g_printerr ("Unable to save “%s”: %s\n", display_name, error->message);
+      msg = g_strdup_printf ("Unable to save as “%s”", display_name);
     }
+  else
+    {
+      msg = g_strdup_printf ("Saved as “%s”", display_name); 
+    }
+  
+  adw_toast_overlay_add_toast (self->toast_overlay, adw_toast_new (msg));
+}
+
+static void //Функция очищает экземпляр GSettings и связывает его с родительской реализацией
+text_viewer_window_finalize (GObject *gobject)
+{
+  
+  TextViewerWindow *self = TEXT_VIEWER_WINDOW (gobject);
+
+  g_clear_object (&self->settings);
+
+  G_OBJECT_CLASS (text_viewer_window_parent_class)->finalize (gobject);
 }
