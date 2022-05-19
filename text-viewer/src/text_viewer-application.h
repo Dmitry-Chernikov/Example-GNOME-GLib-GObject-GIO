@@ -29,4 +29,14 @@ G_DECLARE_FINAL_TYPE (TextViewerApplication, text_viewer_application, TEXT_VIEWE
 TextViewerApplication *text_viewer_application_new (gchar *application_id,
                                                     GApplicationFlags  flags);
 
+static void // это обратный вызов переключает состояние действия в темном режиме между «истинным» и «ложным»
+toggle_dark_mode (GSimpleAction               *action,
+                  GVariant                    *parameter G_GNUC_UNUSED,
+                  TextViewerApplication       *self G_GNUC_UNUSED);
+
+static void // этот обратный вызов отвечает за переключение цветовой схемы приложения с помощью AdwStyleManager API
+change_color_scheme (GSimpleAction         *action,
+                     GVariant              *new_state,
+                     TextViewerApplication *self);
+
 G_END_DECLS

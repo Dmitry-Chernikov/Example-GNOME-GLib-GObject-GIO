@@ -47,10 +47,10 @@
     </child>
 
     <child>
-      
+
       <object class="AdwToastOverlay" id="toast_overlay">
         <property name="child">
-          
+
           <object class="GtkScrolledWindow">
             <property name="hexpand">true</property>
             <property name="vexpand">true</property>
@@ -59,17 +59,17 @@
             <property name="margin-start">6</property>
             <property name="margin-end">6</property>
             <property name="child">
-              
+
               <object class="GtkTextView" id="main_text_view">
                 <property name="monospace">true</property>
               </object>
-              
+
             </property>
           </object>
-          
+
         </property>
       </object>
-      
+
     </child>
 
     <!-- <child> -->
@@ -90,14 +90,22 @@
         <attribute name="label" translatable="yes">_Save as...</attribute>
         <attribute name="action">win.save-as</attribute>
       </item>
+
+      <item>
+        <attribute name="label" translatable="yes">_Dark Mode</attribute>
+        <attribute name="action">app.dark-mode</attribute>
+      </item>
+
       <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
+
       <item>
         <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
         <attribute name="action">win.show-help-overlay</attribute>
       </item>
+
       <item>
         <attribute name="label" translatable="yes">_About text-viewer</attribute>
         <attribute name="action">app.about</attribute>
