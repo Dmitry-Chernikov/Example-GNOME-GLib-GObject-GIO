@@ -12,48 +12,18 @@
     <child type="titlebar">
       <object class="GtkHeaderBar" id="header_bar">
 
-        <!-- <child type="start"> -->
-        <!--   <object class="GtkButton" id="custom-button"> -->
-        <!--     <property name="child"> -->
-        <!--       <object class="GtkBox"> -->
-        <!--         <property name="orientation">horizontal</property> -->
-        <!--         <property name="spacing">12</property> -->
-        <!--         <child> -->
-        <!--           <object class="GtkImage"> -->
-        <!--             <property name="icon-name">audio-volume-muted-symbolic</property> -->
-        <!--           </object> -->
-        <!--         </child> -->
-        <!--         <child> -->
-        <!--           <object class="GtkLabel"> -->
-        <!--             <property name="text">_Mute</property> -->
-        <!--             <property name="use-underline">true</property> -->
-        <!--           </object> -->
-        <!--         </child> -->
-        <!--       </object> -->
-        <!--     </property> -->
-        <!--   </object> -->
-        <!-- </child> -->
-
         <child type="start">
           <object class="GtkButton" id="open_button">
-            <property name="label" translatable="yes">Open</property>
-            <!-- <property name="icon-name">audio-volume-muted-symbolic</property> -->
-            <!-- <property name="use_underline">True</property> -->
+            <property name="label">Open</property>
             <property name="action-name">win.open</property>
-            <style>
-              <class name="suggested-action"/>
-            </style>
+            <property name="icon-name">audio-volume-muted-symbolic</property>
           </object>
-
         </child>
 
         <child type="start">
           <object class="GtkButton" id="save_button">
             <property name="label">Save</property>
             <property name="action-name">win.save</property>
-            <style>
-              <class name="destructive-action"/>
-            </style>
           </object>
         </child>
 
@@ -78,6 +48,28 @@
     </child>
 
     <child>
+          <object class="GtkButton" id="custom-button">
+            <property name="child">
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="spacing">12</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">audio-volume-muted-symbolic</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="text">_Mute</property>
+                    <property name="use-underline">true</property>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+    </child>
+
+    <child>
       <object class="AdwToastOverlay" id="toast_overlay">
         <property name="child">
 
@@ -88,14 +80,15 @@
             <property name="margin-bottom">6</property>
             <property name="margin-start">6</property>
             <property name="margin-end">6</property>
-
             <property name="child">
+
               <object class="GtkTextView" id="main_text_view">
                 <property name="monospace">true</property>
               </object>
-            </property>
 
+            </property>
           </object>
+
         </property>
       </object>
     </child>
