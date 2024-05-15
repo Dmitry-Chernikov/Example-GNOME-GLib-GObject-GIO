@@ -1,0 +1,14 @@
+http://www.redov.ru/kompyutery_i_internet/osnovy_programmirovanija_v_linux/index.php
+https://librebay.github.io/index.html
+wget -r -k -l 7 -p -E -nc https://librebay.github.io/
+
+https://www.youtube.com/playlist?list=PL3298EHIjSRA30RzpuPv4fp0LVW8ilYwl
+
+https://developer.gnome.org/documentation/index.html
+https://docs.flathub.org/docs/for-app-authors/why-flathub/
+https://docs.flatpak.org/ru/latest/flatpak-builder.html
+https://www.gtk.org/docs/
+https://docs.gtk.org/glib/index.html
+
+устарела
+https://developer-old.gnome.org/gobject/unstable/chapter-intro.html
